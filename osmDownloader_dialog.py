@@ -24,7 +24,7 @@
 import os
 
 from PyQt4 import QtGui, uic
-from PyQt4.QtCore import pyqtSlot
+from PyQt4.QtCore import pyqtSlot, QThreadPool, Qt
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'osmDownloader_dialog_base.ui'))
@@ -33,7 +33,7 @@ from osm_downloader import OSMRequest
 
 
 class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
-    def __init__(self, startX, startY, endX, endY, parent=None):
+    def __init__(self, iface, startX, startY, endX, endY, parent=None):
         """Constructor."""
         super(OSMDownloaderDialog, self).__init__(parent)
         # Set up the user interface from Designer.
@@ -42,6 +42,8 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+
+        self.iface = iface
 
         self.setCoordinates(startX, startY, endX, endY)
 
@@ -68,7 +70,13 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
     @pyqtSlot()
     def on_saveButton_clicked(self):
         fileName = QtGui.QFileDialog.getSaveFileName(parent=None, caption='Define file name and location', filter='OSM Files(*.osm)')
-        fileName += '.osm'
+
+        split = fileName.split('.')
+        if len(split)>0 and split[-1] == 'osm':
+            pass
+        else:
+            fileName += '.osm'
+
         self.filenameEdit.setText(fileName)
 
     @pyqtSlot()
@@ -78,4 +86,24 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
             return
 
         osmRequest = OSMRequest(self.filenameEdit.text())
-        osmRequest.executeRequest(self.wEdit.text(), self.sEdit.text(), self.eEdit.text(), self.nEdit.text())
+        osmRequest.setParameters(self.wEdit.text(), self.sEdit.text(), self.eEdit.text(), self.nEdit.text())
+
+        # Connecting end signal
+        osmRequest.signals.processFinished.connect(self.processFinished)
+
+        # Setting the progress bar
+        self.progressMessageBar = self.iface.messageBar().createMessage('Downloading data...')
+        self.progressBar = QtGui.QProgressBar()
+        self.progressBar.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+        self.progressMessageBar.layout().addWidget(self.progressBar)
+        self.iface.messageBar().pushWidget(self.progressMessageBar, self.iface.messageBar().INFO)
+        self.progressBar.setRange(0, 0)
+
+        # Initiating processing
+        QThreadPool.globalInstance().start(osmRequest)
+
+    @pyqtSlot()
+    def processFinished(self):
+        self.progressBar.setRange(0, 100)
+        self.progressBar.setValeu(100)
+        QtGui.QMessageBox.warning(self, self.tr("Info!"), self.tr("Download finished!"))

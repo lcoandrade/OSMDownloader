@@ -187,7 +187,7 @@ class OSMDownloader:
     def run(self, startX, startY, endX, endY):
         """Run method that performs all the real work"""
         # Create the dialog (after translation) and keep reference
-        self.dlg = OSMDownloaderDialog(startX, startY, endX, endY)
+        self.dlg = OSMDownloaderDialog(self.iface, startX, startY, endX, endY)
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
