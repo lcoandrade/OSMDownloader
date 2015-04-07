@@ -25,6 +25,9 @@ from qgis.core import *
 from PyQt4.Qt import *
 
 class RectangleAreaTool(QgsMapTool):
+
+    rectangleCreated = pyqtSignal(float, float, float, float)
+
     def __init__(self, canvas, action):
         QgsMapTool.__init__(self, canvas)
 
@@ -56,6 +59,8 @@ class RectangleAreaTool(QgsMapTool):
             lRect = self.canvas.mapSettings().mapToLayerCoordinates(layer, r)
 
         self.rubberBand.hide()
+
+        self.rectangleCreated.emit(self.startPoint.x(), self.startPoint.y(), self.endPoint.x(), self.endPoint.y())
 
     def canvasMoveEvent(self, e):
         if not self.isEmittingPoint:

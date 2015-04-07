@@ -60,9 +60,6 @@ class OSMDownloader:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        # Create the dialog (after translation) and keep reference
-        self.dlg = OSMDownloaderDialog()
-
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&OSM Downloader')
@@ -175,6 +172,8 @@ class OSMDownloader:
 
         self.rectangleAreaTool = RectangleAreaTool(self.iface.mapCanvas(), self.rectangleAction)
 
+        self.rectangleAreaTool.rectangleCreated.connect(self.run)
+
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
@@ -185,8 +184,10 @@ class OSMDownloader:
         # remove the toolbar
         del self.toolbar
 
-    def run(self):
+    def run(self, startX, startY, endX, endY):
         """Run method that performs all the real work"""
+        # Create the dialog (after translation) and keep reference
+        self.dlg = OSMDownloaderDialog(startX, startY, endX, endY)
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -202,3 +203,4 @@ class OSMDownloader:
             self.iface.mapCanvas().setMapTool(self.rectangleAreaTool)
         else:
             self.iface.mapCanvas().unsetMapTool(self.rectangleAreaTool)
+
