@@ -28,6 +28,8 @@ import resources_rc
 from osmDownloader_dialog import OSMDownloaderDialog
 import os.path
 
+from rectangleAreaTool import RectangleAreaTool
+
 
 class OSMDownloader:
     """QGIS Plugin Implementation."""
@@ -83,7 +85,6 @@ class OSMDownloader:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('OSMDownloader', message)
 
-
     def add_action(
         self,
         icon_path,
@@ -94,7 +95,8 @@ class OSMDownloader:
         add_to_toolbar=True,
         status_tip=None,
         whats_this=None,
-        parent=None):
+        parent=None,
+        checkable=True):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -145,6 +147,8 @@ class OSMDownloader:
         if whats_this is not None:
             action.setWhatsThis(whats_this)
 
+        action.setCheckable(checkable)
+
         if add_to_toolbar:
             self.toolbar.addAction(action)
 
@@ -160,13 +164,16 @@ class OSMDownloader:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/OSMDownloader/icon.png'
-        self.add_action(
-            icon_path,
-            text=self.tr(u'Download OSM data'),
-            callback=self.run,
-            parent=self.iface.mainWindow())
+        icon_path = ':/plugins/OSMDownloader/icon_rectangle.png'
+        self.rectangleAction = self.add_action(
+                                        icon_path,
+                                        text=self.tr(u'Download OSM data'),
+                                        callback=self.runRectangle,
+                                        parent=self.iface.mainWindow(),
+                                        add_to_menu=False,
+                                        checkable=True)
 
+        self.rectangleAreaTool = RectangleAreaTool(self.iface.mapCanvas(), self.rectangleAction)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -177,7 +184,6 @@ class OSMDownloader:
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
-
 
     def run(self):
         """Run method that performs all the real work"""
@@ -190,3 +196,9 @@ class OSMDownloader:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
             pass
+
+    def runRectangle(self, b):
+        if b:
+            self.iface.mapCanvas().setMapTool(self.rectangleAreaTool)
+        else:
+            self.iface.mapCanvas().unsetMapTool(self.rectangleAreaTool)

@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/plugins/OSMDownloader" >
         <file>icon.png</file>
+        <file>icon_rectangle.png</file>
     </qresource>
 </RCC>
