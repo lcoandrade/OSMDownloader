@@ -68,11 +68,11 @@ class OSMRequest(QRunnable):
 
         try:
             response = urllib2.urlopen(req, None, 10)
-        except urllib2.URLError, e:
-            self.signals.processFinished.emit('Oops, timed out?')
+        except urllib2.URLError:
+            self.signals.processFinished.emit('Timed out! Try again later.')
             return
         except socket.timeout:
-            self.signals.processFinished.emit('Timed out!')
+            self.signals.processFinished.emit('Timed out! Try again later.')
             return
 
         #downloading the file
@@ -80,4 +80,4 @@ class OSMRequest(QRunnable):
            local_file.write(response.read())
            local_file.close()
 
-        self.signals.processFinished.emit('File Downloaded!')
+        self.signals.processFinished.emit('Success, the file  has been downloaded!')
