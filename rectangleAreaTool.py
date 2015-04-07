@@ -53,13 +53,8 @@ class RectangleAreaTool(QgsMapTool):
 
     def canvasReleaseEvent(self, e):
         self.isEmittingPoint = False
-        r = self.rectangle()
-        layer = self.canvas.currentLayer()
-        if r and layer:
-            lRect = self.canvas.mapSettings().mapToLayerCoordinates(layer, r)
-
         self.rubberBand.hide()
-
+        self.transformCoordinates()
         self.rectangleCreated.emit(self.startPoint.x(), self.startPoint.y(), self.endPoint.x(), self.endPoint.y())
 
     def canvasMoveEvent(self, e):
@@ -83,13 +78,21 @@ class RectangleAreaTool(QgsMapTool):
         self.rubberBand.addPoint(point4, True)    # true to update canvas
         self.rubberBand.show()
 
-    def rectangle(self):
+    def transformCoordinates(self):
         if self.startPoint is None or self.endPoint is None:
             return None
         elif self.startPoint.x() == self.endPoint.x() or self.startPoint.y() == self.endPoint.y():
             return None
 
-        return QgsRectangle(self.startPoint, self.endPoint)
+        # Defining the crs from src and destiny
+        epsg = self.canvas.mapSettings().destinationCrs().authid()
+        crsSrc = QgsCoordinateReferenceSystem(epsg)
+        crsDest = QgsCoordinateReferenceSystem(4326)
+        # Creating a transformer
+        coordinateTransformer = QgsCoordinateTransform(crsSrc, crsDest)
+        # Transforming the points
+        self.startPoint = coordinateTransformer.transform(self.startPoint)
+        self.endPoint = coordinateTransformer.transform(self.endPoint)
 
     def deactivate(self):
         self.rubberBand.hide()
