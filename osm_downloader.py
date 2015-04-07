@@ -68,7 +68,7 @@ class OSMRequest(QRunnable):
 
         try:
             response = urllib2.urlopen(req, None, 10)
-        except URLError, e:
+        except urllib2.URLError, e:
             self.signals.processFinished.emit('Oops, timed out?')
             return
         except socket.timeout:
