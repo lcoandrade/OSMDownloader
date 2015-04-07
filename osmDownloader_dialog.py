@@ -85,12 +85,11 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
             QtGui.QMessageBox.warning(self, self.tr("Warning!"), self.tr("Please, select a location to save the file."))
             return
 
+        # Initiating processing
         osmRequest = OSMRequest(self.filenameEdit.text())
         osmRequest.setParameters(self.wEdit.text(), self.sEdit.text(), self.eEdit.text(), self.nEdit.text())
-
         # Connecting end signal
         osmRequest.signals.processFinished.connect(self.processFinished)
-
         # Setting the progress bar
         self.progressMessageBar = self.iface.messageBar().createMessage('Downloading data...')
         self.progressBar = QtGui.QProgressBar()
@@ -98,12 +97,11 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         self.progressMessageBar.layout().addWidget(self.progressBar)
         self.iface.messageBar().pushWidget(self.progressMessageBar, self.iface.messageBar().INFO)
         self.progressBar.setRange(0, 0)
-
-        # Initiating processing
+        # Starting process
         QThreadPool.globalInstance().start(osmRequest)
 
     @pyqtSlot()
     def processFinished(self):
         self.progressBar.setRange(0, 100)
-        self.progressBar.setValeu(100)
+        self.progressBar.setValue(100)
         QtGui.QMessageBox.warning(self, self.tr("Info!"), self.tr("Download finished!"))
