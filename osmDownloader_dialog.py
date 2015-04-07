@@ -100,8 +100,8 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         # Starting process
         QThreadPool.globalInstance().start(osmRequest)
 
-    @pyqtSlot()
-    def processFinished(self):
+    @pyqtSlot(str)
+    def processFinished(self, message):
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
-        QtGui.QMessageBox.warning(self, self.tr("Info!"), self.tr("Download finished!"))
+        QtGui.QMessageBox.warning(self, 'Info!', message)
