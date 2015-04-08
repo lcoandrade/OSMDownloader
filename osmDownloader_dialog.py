@@ -105,3 +105,6 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
         QtGui.QMessageBox.warning(self, 'Info!', message)
+
+        if self.checkBox.isChecked():
+            self.iface.addVectorLayer(self.filenameEdit.text(), 'osm_data', 'ogr')

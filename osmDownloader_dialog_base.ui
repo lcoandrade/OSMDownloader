@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>592</width>
-    <height>302</height>
+    <width>492</width>
+    <height>308</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -90,6 +90,13 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Save Location:</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QLineEdit" name="filenameEdit"/>
        </item>

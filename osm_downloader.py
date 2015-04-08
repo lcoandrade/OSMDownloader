@@ -80,4 +80,4 @@ class OSMRequest(QRunnable):
            local_file.write(response.read())
            local_file.close()
 
-        self.signals.processFinished.emit('Success, the file  has been downloaded!')
+        self.signals.processFinished.emit('Success, the file has been downloaded!')
