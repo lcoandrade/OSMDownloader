@@ -23,8 +23,6 @@
 
 #Another way to do the Job with OVERPASS
 import urllib2
-import socket
-socket.setdefaulttimeout(10)
 from PyQt4.QtCore import QRunnable, QObject, pyqtSignal, QSettings
 
 class Signals(QObject):
@@ -96,12 +94,9 @@ class OSMRequest(QRunnable):
         req = self.makeRequest()
 
         try:
-            response = urllib2.urlopen(req, None, 10)
-        except urllib2.URLError:
-            self.signals.processFinished.emit('Timed out! Try again later.')
-            return
-        except socket.timeout:
-            self.signals.processFinished.emit('Timed out! Try again later.')
+            response = urllib2.urlopen(req)
+        except urllib2.URLError as e:
+            self.signals.processFinished.emit('Error code: '+str(e.code) + '|| Reason: '+str(e.reason))
             return
 
         local_file = open(self.filename, 'wb')
