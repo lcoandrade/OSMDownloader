@@ -104,13 +104,13 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
     @pyqtSlot(float)
     def reportSize(self, size):
         self.size = size
-        # self.progressMessageBar.setText('Downloading: '+str(size)+' megabytes from OSM servers...')
+        self.progressMessageBar.setText('Downloading: '+"{0:.2f}".format(size)+' megabytes from OSM servers...')
 
     @pyqtSlot(str)
     def processFinished(self, message):
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
-        self.progressMessageBar.setText('Downloaded '+str(self.size)+' megabytes in total from OSM servers')
+        self.progressMessageBar.setText('Downloaded '+"{0:.2f}".format(self.size)+' megabytes in total from OSM servers')
         QtGui.QMessageBox.warning(self, 'Info!', message)
 
         if self.checkBox.isChecked():

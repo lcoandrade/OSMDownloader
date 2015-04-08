@@ -22,7 +22,6 @@
 """
 
 #Another way to do the Job with OVERPASS
-import sys
 import urllib2
 import socket
 socket.setdefaulttimeout(10)
@@ -77,11 +76,21 @@ class OSMRequest(QRunnable):
             self.signals.processFinished.emit('Timed out! Try again later.')
             return
 
-        #downloading the file
-        with open(self.filename, 'wb') as local_file:
-            chunk = response.read()
-            self.signals.sizeReported.emit(float(len(chunk))/float(1024)/float(1024))
-            local_file.write(chunk)
-            local_file.close()
+        local_file = open(self.filename, 'wb')
+
+        total_size = 0
+        block_size = 1024*8
+        while True:
+            buffer = response.read(block_size)
+            if not buffer:
+                break
+
+            local_file.write(buffer)
+
+            size = len(buffer)/float(1000000)
+            total_size += size
+            self.signals.sizeReported.emit(total_size)
+
+        local_file.close()
 
         self.signals.processFinished.emit('Success, the file has been downloaded!')
