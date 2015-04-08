@@ -39,7 +39,7 @@ class OSMRequest(QRunnable):
         self.signals = Signals()
 
         self.filename = filename
-        self.xmlData = '<osm-script>'
+        self.xmlData = '<osm-script timeout=\"10\">'
         self.xmlData += '<union into=\"_\">'
         self.xmlData += '<bbox-query e=\"maxlong\" n=\"maxlat\" s=\"minlat\" w=\"minlong\"/>'
         self.xmlData += '<recurse type=\"up\"/><recurse type=\"down\"/>'
