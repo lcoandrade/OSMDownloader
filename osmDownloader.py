@@ -161,10 +161,10 @@ class OSMDownloader:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/OSMDownloader/icon_rectangle.png'
+        icon_path = ':/plugins/OSMDownloader/rectangle.png'
         self.rectangleAction = self.add_action(
                                         icon_path,
-                                        text=self.tr(u'Download OSM data'),
+                                        text=self.tr(u'Download OSM data by rectangle selection'),
                                         callback=self.runRectangle,
                                         parent=self.iface.mainWindow(),
                                         add_to_menu=False,
