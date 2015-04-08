@@ -90,6 +90,7 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         osmRequest.setParameters(self.wEdit.text(), self.sEdit.text(), self.eEdit.text(), self.nEdit.text())
         # Connecting end signal
         osmRequest.signals.processFinished.connect(self.processFinished)
+        osmRequest.signals.sizeReported.connect(self.reportSize)
         # Setting the progress bar
         self.progressMessageBar = self.iface.messageBar().createMessage('Downloading data...')
         self.progressBar = QtGui.QProgressBar()
@@ -100,11 +101,19 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         # Starting process
         QThreadPool.globalInstance().start(osmRequest)
 
+    @pyqtSlot(float)
+    def reportSize(self, size):
+        self.size = size
+        # self.progressMessageBar.setText('Downloading: '+str(size)+' megabytes from OSM servers...')
+
     @pyqtSlot(str)
     def processFinished(self, message):
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
+        self.progressMessageBar.setText('Downloaded '+str(self.size)+' megabytes in total from OSM servers')
         QtGui.QMessageBox.warning(self, 'Info!', message)
 
         if self.checkBox.isChecked():
             self.iface.addVectorLayer(self.filenameEdit.text(), 'osm_data', 'ogr')
+
+        self.close()

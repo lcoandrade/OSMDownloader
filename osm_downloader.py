@@ -22,6 +22,7 @@
 """
 
 #Another way to do the Job with OVERPASS
+import sys
 import urllib2
 import socket
 socket.setdefaulttimeout(10)
@@ -29,6 +30,7 @@ from PyQt4.QtCore import QRunnable, QObject, pyqtSignal
 
 class Signals(QObject):
     processFinished = pyqtSignal(str)
+    sizeReported = pyqtSignal(float)
 
 class OSMRequest(QRunnable):
     def __init__(self, filename):
@@ -77,7 +79,9 @@ class OSMRequest(QRunnable):
 
         #downloading the file
         with open(self.filename, 'wb') as local_file:
-           local_file.write(response.read())
-           local_file.close()
+            chunk = response.read()
+            self.signals.sizeReported.emit(float(len(chunk))/float(1024)/float(1024))
+            local_file.write(chunk)
+            local_file.close()
 
         self.signals.processFinished.emit('Success, the file has been downloaded!')
