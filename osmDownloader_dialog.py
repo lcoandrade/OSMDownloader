@@ -91,6 +91,7 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         # Connecting end signal
         osmRequest.signals.processFinished.connect(self.processFinished)
         osmRequest.signals.sizeReported.connect(self.reportSize)
+        osmRequest.signals.proxyOpened.connect(self.proxy)
         # Setting the progress bar
         self.progressMessageBar = self.iface.messageBar().createMessage('Downloading data...')
         self.progressBar = QtGui.QProgressBar()
@@ -100,6 +101,11 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         self.progressBar.setRange(0, 0)
         # Starting process
         QThreadPool.globalInstance().start(osmRequest)
+
+    @pyqtSlot(str)
+    def proxy(self, proxy):
+        print proxy
+        self.progressMessageBar.setText('Proxy set to: '+proxy)
 
     @pyqtSlot(float)
     def reportSize(self, size):

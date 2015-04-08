@@ -25,11 +25,12 @@
 import urllib2
 import socket
 socket.setdefaulttimeout(10)
-from PyQt4.QtCore import QRunnable, QObject, pyqtSignal
+from PyQt4.QtCore import QRunnable, QObject, pyqtSignal, QSettings
 
 class Signals(QObject):
     processFinished = pyqtSignal(str)
     sizeReported = pyqtSignal(float)
+    proxyOpened = pyqtSignal(str)
 
 class OSMRequest(QRunnable):
     def __init__(self, filename):
@@ -44,6 +45,31 @@ class OSMRequest(QRunnable):
         self.xmlData += '<recurse type=\"up\"/><recurse type=\"down\"/>'
         self.xmlData += '</union><print limit=\"\" mode=\"meta\" order=\"id\"/>'
         self.xmlData += '</osm-script>'
+
+    def getProxyConfiguration(self):
+        settings = QSettings()
+        settings.beginGroup('proxy')
+        enabled = settings.value('proxyEnable')
+        host = settings.value('proxyHost')
+        port = settings.value('proxyPort')
+        user = settings.value('proxyUser')
+        password = settings.value('proxyPassword')
+        type = settings.value('proxyType')
+        settings.endGroup()
+        return (enabled, host, port, user, password, type)
+
+    def setUrllibProxy(self):
+        (enabled, host, port, user, password, type) = self.getProxyConfiguration()
+        if enabled == 'false' or type != 'HttpProxy':
+            self.signals.proxyOpened.emit('No proxy set.')
+            return
+
+        proxyStr = 'http://'+user+':'+password+'@'+host+':'+port
+        self.signals.proxyOpened.emit(proxyStr)
+
+        proxy = urllib2.ProxyHandler({'http': proxyStr})
+        opener = urllib2.build_opener(proxy, urllib2.HTTPHandler)
+        urllib2.install_opener(opener)
 
     def setParameters(self, minLong, minLat, maxLong, maxLat):
         self.minLong = minLong
@@ -65,6 +91,8 @@ class OSMRequest(QRunnable):
         return req
 
     def run(self):
+        self.setUrllibProxy()
+
         req = self.makeRequest()
 
         try:
