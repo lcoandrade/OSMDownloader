@@ -11,8 +11,8 @@ name=OSM Downloader
 qgisMinimumVersion=2.0
 description=Plugin to download OSM data by area
 version=0.1
-author=Brazilian Army - Geographic Service Bureau
-email=suporte.dsgtools@dsg.eb.mil.br
+author=Luiz Andrade - Cartographic Engineer @Brazilian Army
+email=lcoandrade@gmail.com
 
 # End of mandatory metadata
 
@@ -22,15 +22,15 @@ email=suporte.dsgtools@dsg.eb.mil.br
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=OSM,downloader,Brazilian,Army,Exército,Brasileiro,DSG,Diretoria,Serviço,Geográfico
+tags=OSM,downloader,rectangle,thread
 
-homepage=
-tracker=
-repository=
+homepage=http://hub.qgis.org/projects/osmdownloader
+tracker=http://hub.qgis.org/projects/osmdownloader
+repository=https://github.com/lcoandrade/OSMDownloader
 category=Plugins
-icon=icon.png
+icon=rectangle.png
 # experimental flag
-experimental=False
+experimental=True
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
