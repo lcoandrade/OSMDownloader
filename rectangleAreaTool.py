@@ -35,7 +35,7 @@ class RectangleAreaTool(QgsMapTool):
         self.active = False
         self.setAction(action)
         self.rubberBand = QgsRubberBand(self.canvas, QGis.Polygon)
-        mFillColor = QColor( 254, 178, 76, 63 );
+        mFillColor = QColor(254, 178, 76, 63)
         self.rubberBand.setColor(mFillColor)
         self.rubberBand.setWidth(1)
         self.reset()
