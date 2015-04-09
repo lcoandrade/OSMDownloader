@@ -97,6 +97,3 @@ class RectangleAreaTool(QgsMapTool):
     def deactivate(self):
         self.rubberBand.hide()
         QgsMapTool.deactivate(self)
-
-    def activate(self):
-        QgsMapTool.activate(self)

@@ -88,12 +88,12 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
             return
 
         # Initiating processing
-        osmRequest = OSMRequest(self.filenameEdit.text())
-        osmRequest.setParameters(self.wEdit.text(), self.sEdit.text(), self.eEdit.text(), self.nEdit.text())
+        self.osmRequest = OSMRequest(self.filenameEdit.text())
+        self.osmRequest.setParameters(self.wEdit.text(), self.sEdit.text(), self.eEdit.text(), self.nEdit.text())
         # Connecting end signal
-        osmRequest.signals.processFinished.connect(self.processFinished)
-        osmRequest.signals.sizeReported.connect(self.reportSize)
-        osmRequest.signals.proxyOpened.connect(self.proxy)
+        self.osmRequest.signals.processFinished.connect(self.processFinished)
+        self.osmRequest.signals.sizeReported.connect(self.reportSize)
+        self.osmRequest.signals.proxyOpened.connect(self.proxy)
         # Setting the progress bar
         self.progressMessageBar = self.iface.messageBar().createMessage('Downloading data...')
         self.progressBar = QtGui.QProgressBar()
@@ -101,12 +101,18 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         self.progressMessageBar.layout().addWidget(self.progressBar)
         self.iface.messageBar().pushWidget(self.progressMessageBar, self.iface.messageBar().INFO)
         self.progressBar.setRange(0, 0)
+        self.progressMessageBar.destroyed.connect(self.userCanceled)
         # Starting process
-        self.threadpool.start(osmRequest)
+        self.threadpool.start(self.osmRequest)
 
     @pyqtSlot(str)
     def proxy(self, proxy):
         self.progressMessageBar.setText('Proxy set to: '+proxy)
+
+    @pyqtSlot()
+    def userCanceled(self):
+        self.osmRequest.stop()
+        QtGui.QMessageBox.warning(self, 'Info!', 'Process canceled by user!')
 
     @pyqtSlot(float)
     def reportSize(self, size):

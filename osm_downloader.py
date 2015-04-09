@@ -44,6 +44,11 @@ class OSMRequest(QRunnable):
         self.xmlData += '</union><print limit=\"\" mode=\"meta\" order=\"id\"/>'
         self.xmlData += '</osm-script>'
 
+        self.stopped = False
+
+    def stop(self):
+        self.stopped = True
+
     def getProxyConfiguration(self):
         settings = QSettings()
         settings.beginGroup('proxy')
@@ -103,7 +108,7 @@ class OSMRequest(QRunnable):
 
         total_size = 0
         block_size = 1024*8
-        while True:
+        while not self.stopped:
             buffer = response.read(block_size)
             if not buffer:
                 break
@@ -116,4 +121,5 @@ class OSMRequest(QRunnable):
 
         local_file.close()
 
-        self.signals.processFinished.emit('Success, the file has been downloaded!')
+        if not self.stopped:
+            self.signals.processFinished.emit('Success, the file has been downloaded!')
