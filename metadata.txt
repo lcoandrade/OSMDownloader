@@ -30,7 +30,7 @@ repository=https://github.com/lcoandrade/OSMDownloader
 category=Plugins
 icon=rectangle.png
 # experimental flag
-experimental=True
+experimental=False
 
 # deprecated flag (applies to the whole plugin, not just a single version)
 deprecated=False
