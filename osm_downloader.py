@@ -68,7 +68,7 @@ class OSMRequest(QRunnable):
             return
 
         proxyStr = 'http://'+user+':'+password+'@'+host+':'+port
-        self.signals.proxyOpened.emit(proxyStr)
+        self.signals.proxyOpened.emit(host+'| Port: '+port)
 
         proxy = urllib2.ProxyHandler({'http': proxyStr})
         opener = urllib2.build_opener(proxy, urllib2.HTTPHandler)
