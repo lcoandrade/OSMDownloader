@@ -49,6 +49,8 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
 
         self.threadpool = QThreadPool()
 
+        self.size = 0
+
     def setCoordinates(self, startX, startY, endX, endY):
         if startX < endX:
             minLong = startX
@@ -88,12 +90,14 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
             return
 
         # Initiating processing
-        self.osmRequest = OSMRequest(self.filenameEdit.text())
-        self.osmRequest.setParameters(self.wEdit.text(), self.sEdit.text(), self.eEdit.text(), self.nEdit.text())
+        osmRequest = OSMRequest(self.filenameEdit.text())
+        osmRequest.setParameters(self.wEdit.text(), self.sEdit.text(), self.eEdit.text(), self.nEdit.text())
         # Connecting end signal
-        self.osmRequest.signals.processFinished.connect(self.processFinished)
-        self.osmRequest.signals.sizeReported.connect(self.reportSize)
-        self.osmRequest.signals.proxyOpened.connect(self.proxy)
+        osmRequest.signals.processFinished.connect(self.processFinished)
+        osmRequest.signals.sizeReported.connect(self.reportSize)
+        osmRequest.signals.proxyOpened.connect(self.proxy)
+        osmRequest.signals.errorOccurred.connect(self.errorOccurred)
+        osmRequest.signals.userCanceled.connect(self.userCanceled)
         # Setting the progress bar
         self.progressMessageBar = self.iface.messageBar().createMessage('Downloading data...')
         self.progressBar = QtGui.QProgressBar()
@@ -101,18 +105,23 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         self.progressMessageBar.layout().addWidget(self.progressBar)
         self.iface.messageBar().pushWidget(self.progressMessageBar, self.iface.messageBar().INFO)
         self.progressBar.setRange(0, 0)
-        self.progressMessageBar.destroyed.connect(self.userCanceled)
+        self.progressMessageBar.destroyed.connect(osmRequest.signals.cancel)
         # Starting process
-        self.threadpool.start(self.osmRequest)
+        self.threadpool.start(osmRequest)
 
     @pyqtSlot(str)
     def proxy(self, proxy):
         self.progressMessageBar.setText('Proxy set to: '+proxy)
 
+    @pyqtSlot(str)
+    def errorOccurred(self, message):
+        QtGui.QMessageBox.warning(self, 'Fatal!', message)
+        self.close()
+
     @pyqtSlot()
     def userCanceled(self):
-        self.osmRequest.stop()
         QtGui.QMessageBox.warning(self, 'Info!', 'Process canceled by user!')
+        self.close()
 
     @pyqtSlot(float)
     def reportSize(self, size):

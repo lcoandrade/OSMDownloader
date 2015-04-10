@@ -23,18 +23,29 @@
 
 #Another way to do the Job with OVERPASS
 import urllib2
-from PyQt4.QtCore import QRunnable, QObject, pyqtSignal, QSettings
+from PyQt4.QtCore import QRunnable, QObject, pyqtSignal, QSettings, pyqtSlot
 
 class Signals(QObject):
     processFinished = pyqtSignal(str)
     sizeReported = pyqtSignal(float)
     proxyOpened = pyqtSignal(str)
+    errorOccurred = pyqtSignal(str)
+    userCanceled = pyqtSignal()
+
+    def __init__(self, thread):
+        super(Signals, self).__init__()
+
+        self.thread = thread
+
+    @pyqtSlot()
+    def cancel(self):
+        self.thread.stop()
 
 class OSMRequest(QRunnable):
     def __init__(self, filename):
         super(OSMRequest, self).__init__()
 
-        self.signals = Signals()
+        self.signals = Signals(self)
 
         self.filename = filename
         self.xmlData = '<osm-script timeout=\"10\">'
@@ -100,26 +111,38 @@ class OSMRequest(QRunnable):
 
         try:
             response = urllib2.urlopen(req)
-        except urllib2.URLError as e:
-            self.signals.processFinished.emit('Error code: '+str(e.code) + '|| Reason: '+str(e.reason))
+        except urllib2.URLError, e:
+            self.signals.errorOccurred.emit('Error occurred: '+str(e.args) + '\nReason: '+str(e.reason))
+            return
+        except urllib2.HTTPError, e:
+            self.signals.errorOccurred.emit('Error occurred: '+str(e.code) + '\nReason: '+str(e.msg))
             return
 
         local_file = open(self.filename, 'wb')
 
         total_size = 0
         block_size = 1024*8
-        while not self.stopped:
-            buffer = response.read(block_size)
-            if not buffer:
-                break
+        while True:
+            if not self.stopped:
+                buffer = response.read(block_size)
+                if not buffer:
+                    break
 
-            local_file.write(buffer)
+                try:
+                    local_file.write(buffer)
 
-            size = len(buffer)/float(1000000)
-            total_size += size
-            self.signals.sizeReported.emit(total_size)
+                    size = len(buffer)/float(1000000)
+                    total_size += size
+                    self.signals.sizeReported.emit(total_size)
+                except:
+                    local_file.close()
+                    self.signals.errorOccurred.emit('An error occurred writing the osm file.')
+                    return
+            else:
+                local_file.close()
+                self.signals.userCanceled.emit()
+                return
 
         local_file.close()
 
-        if not self.stopped:
-            self.signals.processFinished.emit('Success, the file has been downloaded!')
+        self.signals.processFinished.emit('Success, the file has been downloaded!')

@@ -10,7 +10,7 @@
 name=OSMDownloader
 qgisMinimumVersion=2.0
 description=Plugin to download OSM data by area, using a selection by rectangle. The plugin can also automatically load the osm file into QGIS in a transparent way.
-version=0.2
+version=0.3
 author=Luiz Andrade
 email=lcoandrade@gmail.com
 
@@ -19,7 +19,7 @@ email=lcoandrade@gmail.com
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-changelog=Now it is possible to cancel the download by closing the progress bar.
+changelog=Fixed bad connections bug. Now it is possible to cancel the download by closing the progress bar. Fixed user cancellation bug.
 
 # Tags are comma separated with spaces allowed
 tags=OSM,downloader,rectangle,thread,area,OpenStreetMap,tool
