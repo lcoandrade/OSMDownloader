@@ -122,27 +122,24 @@ class OSMRequest(QRunnable):
 
         total_size = 0
         block_size = 1024*8
-        while True:
-            if not self.stopped:
-                buffer = response.read(block_size)
-                if not buffer:
-                    break
+        while not self.stopped:
+            buffer = response.read(block_size)
+            if not buffer:
+                break
 
-                try:
-                    local_file.write(buffer)
+            try:
+                local_file.write(buffer)
 
-                    size = len(buffer)/float(1000000)
-                    total_size += size
-                    self.signals.sizeReported.emit(total_size)
-                except:
-                    local_file.close()
-                    self.signals.errorOccurred.emit('An error occurred writing the osm file.')
-                    return
-            else:
+                size = len(buffer)/float(1000000)
+                total_size += size
+                self.signals.sizeReported.emit(total_size)
+            except:
                 local_file.close()
-                self.signals.userCanceled.emit()
+                self.signals.errorOccurred.emit('An error occurred writing the osm file.')
                 return
 
         local_file.close()
-
-        self.signals.processFinished.emit('Success, the file has been downloaded!')
+        if self.stopped:
+            self.signals.userCanceled.emit()
+        else:
+            self.signals.processFinished.emit('Success, the file has been downloaded!')
