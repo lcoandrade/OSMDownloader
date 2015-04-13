@@ -24,6 +24,9 @@
 #Another way to do the Job with OVERPASS
 import urllib2
 from PyQt4.QtCore import QRunnable, QObject, pyqtSignal, QSettings, pyqtSlot
+from PyQt4.Qt import QThreadPool, QApplication
+import time
+import sys
 
 class Signals(QObject):
     processFinished = pyqtSignal(str)
@@ -61,14 +64,14 @@ class OSMRequest(QRunnable):
         self.stopped = True
 
     def getProxyConfiguration(self):
-        settings = QSettings()
+        settings = QSettings('QGIS', 'QGIS2')
         settings.beginGroup('proxy')
-        enabled = settings.value('proxyEnable')
-        host = settings.value('proxyHost')
-        port = settings.value('proxyPort')
-        user = settings.value('proxyUser')
-        password = settings.value('proxyPassword')
-        type = settings.value('proxyType')
+        enabled = str(settings.value('proxyEnable'))
+        host = str(settings.value('proxyHost'))
+        port = str(settings.value('proxyPort'))
+        user = str(settings.value('proxyUser'))
+        password = str(settings.value('proxyPassword'))
+        type = str(settings.value('proxyType'))
         settings.endGroup()
         return (enabled, host, port, user, password, type)
 
@@ -123,16 +126,15 @@ class OSMRequest(QRunnable):
         total_size = 0
         block_size = 1024*8
         while not self.stopped:
+            self.signals.sizeReported.emit(total_size)
             buffer = response.read(block_size)
             if not buffer:
                 break
 
             try:
                 local_file.write(buffer)
-
                 size = len(buffer)/float(1000000)
                 total_size += size
-                self.signals.sizeReported.emit(total_size)
             except:
                 local_file.close()
                 self.signals.errorOccurred.emit('An error occurred writing the osm file.')
@@ -140,6 +142,8 @@ class OSMRequest(QRunnable):
 
         local_file.close()
         if self.stopped:
+            response.close()
             self.signals.userCanceled.emit()
         else:
             self.signals.processFinished.emit('Success, the file has been downloaded!')
+            
