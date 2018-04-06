@@ -14,7 +14,7 @@ __copyright__ = 'Copyright 2015, Brazilian Army - Geographic Service Bureau'
 
 import unittest
 
-from PyQt4.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 
 
 

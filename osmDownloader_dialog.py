@@ -20,19 +20,22 @@
  *                                                                         *
  ***************************************************************************/
 """
+from __future__ import absolute_import
 
+from builtins import str
 import os
 
-from PyQt4 import QtGui, uic
-from PyQt4.QtCore import pyqtSlot, QThreadPool, Qt
+from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QProgressBar
+from qgis.PyQt import uic
+from qgis.PyQt.QtCore import pyqtSlot, QThreadPool, Qt
+from qgis.core import Qgis
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'osmDownloader_dialog_base.ui'))
 
-from osm_downloader import OSMRequest
+from .osm_downloader import OSMRequest
 
-
-class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
+class OSMDownloaderDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, startX, startY, endX, endY, parent=None):
         """Constructor."""
         super(OSMDownloaderDialog, self).__init__(parent)
@@ -73,7 +76,8 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
 
     @pyqtSlot()
     def on_saveButton_clicked(self):
-        fileName = QtGui.QFileDialog.getSaveFileName(parent=None, caption='Define file name and location', filter='OSM Files(*.osm)')
+        ret = QFileDialog.getSaveFileName(parent=None, caption='Define file name and location', filter='OSM Files(*.osm)')
+        fileName = ret[0]
 
         split = fileName.split('.')
         if len(split)>0 and split[-1] == 'osm':
@@ -86,7 +90,7 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
     @pyqtSlot()
     def on_button_box_accepted(self):
         if self.filenameEdit.text() == '':
-            QtGui.QMessageBox.warning(self, self.tr("Warning!"), self.tr("Please, select a location to save the file."))
+            QMessageBox.warning(self, self.tr("Warning!"), self.tr("Please, select a location to save the file."))
             return
 
         # Initiating processing
@@ -100,10 +104,10 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         osmRequest.signals.userCanceled.connect(self.userCanceled)
         # Setting the progress bar
         self.progressMessageBar = self.iface.messageBar().createMessage('Downloading data...')
-        self.progressBar = QtGui.QProgressBar()
+        self.progressBar = QProgressBar()
         self.progressBar.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         self.progressMessageBar.layout().addWidget(self.progressBar)
-        self.iface.messageBar().pushWidget(self.progressMessageBar, self.iface.messageBar().INFO)
+        self.iface.messageBar().pushWidget(self.progressMessageBar, Qgis.Info)
         self.progressBar.setRange(0, 0)
         self.progressMessageBar.destroyed.connect(osmRequest.signals.cancel)
         # Starting process
@@ -115,12 +119,12 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
 
     @pyqtSlot(str)
     def errorOccurred(self, message):
-        QtGui.QMessageBox.warning(self, 'Fatal!', message)
+        QMessageBox.warning(self, 'Fatal!', message)
         self.close()
 
     @pyqtSlot()
     def userCanceled(self):
-        QtGui.QMessageBox.warning(self, 'Info!', 'Process canceled by user!')
+        QMessageBox.warning(self, 'Info!', 'Process canceled by user!')
         self.close()
 
     @pyqtSlot(float)
@@ -133,7 +137,7 @@ class OSMDownloaderDialog(QtGui.QDialog, FORM_CLASS):
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
         self.progressMessageBar.setText('Downloaded '+"{0:.2f}".format(self.size)+' megabytes in total from OSM servers')
-        QtGui.QMessageBox.warning(self, 'Info!', message)
+        QMessageBox.warning(self, 'Info!', message)
 
         if self.checkBox.isChecked():
             self.iface.addVectorLayer(self.filenameEdit.text(), 'osm_data', 'ogr')

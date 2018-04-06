@@ -7,6 +7,7 @@
      (at your option) any later version.
 
 """
+from __future__ import absolute_import
 
 __author__ = 'suporte.dsgtools@dsg.eb.mil.br'
 __date__ = '2015-04-07'
@@ -14,11 +15,11 @@ __copyright__ = 'Copyright 2015, Brazilian Army - Geographic Service Bureau'
 
 import unittest
 
-from PyQt4.QtGui import QDialogButtonBox, QDialog
+from qgis.PyQt.QtWidgets import QDialogButtonBox, QDialog
 
 from osmDownloader_dialog import OSMDownloaderDialog
 
-from utilities import get_qgis_app
+from .utilities import get_qgis_app
 QGIS_APP = get_qgis_app()
 
 

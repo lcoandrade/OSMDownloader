@@ -22,9 +22,11 @@
 """
 
 #Another way to do the Job with OVERPASS
-import urllib2
-from PyQt4.QtCore import QRunnable, QObject, pyqtSignal, QSettings, pyqtSlot
-from PyQt4.Qt import QThreadPool, QApplication
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+import urllib.request, urllib.error, urllib.parse
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QSettings, pyqtSlot, QThreadPool, QRunnable
 import time
 import sys
 
@@ -82,11 +84,12 @@ class OSMRequest(QRunnable):
             return
 
         proxyStr = 'http://'+user+':'+password+'@'+host+':'+port
+        print(proxyStr)
         self.signals.proxyOpened.emit(host+'| Port: '+port)
 
-        proxy = urllib2.ProxyHandler({'http': proxyStr})
-        opener = urllib2.build_opener(proxy, urllib2.HTTPHandler)
-        urllib2.install_opener(opener)
+        proxy = urllib.request.ProxyHandler({'http': proxyStr})
+        opener = urllib.request.build_opener(proxy, urllib.request.HTTPHandler)
+        urllib.request.install_opener(opener)
 
     def setParameters(self, minLong, minLat, maxLong, maxLat):
         self.minLong = minLong
@@ -99,12 +102,13 @@ class OSMRequest(QRunnable):
         xmlData = xmlData.replace('maxlat', str(self.maxLat))
         xmlData = xmlData.replace('minlong', str(self.minLong))
         xmlData = xmlData.replace('minlat', str(self.minLat))
+        xmlData = xmlData.encode('utf-8')
         return xmlData
 
     def makeRequest(self):
         osmUrl = 'http://overpass-api.de/api/interpreter'
         postFile = self.makePostFile()
-        req = urllib2.Request(url=osmUrl, data=postFile, headers={'Content-Type': 'application/xml'})
+        req = urllib.request.Request(url=osmUrl, data=postFile, headers={'Content-Type': 'application/xml'})
         return req
 
     def run(self):
@@ -113,11 +117,11 @@ class OSMRequest(QRunnable):
         req = self.makeRequest()
 
         try:
-            response = urllib2.urlopen(req)
-        except urllib2.URLError, e:
+            response = urllib.request.urlopen(req)
+        except urllib.error.URLError as e:
             self.signals.errorOccurred.emit('Error occurred: '+str(e.args) + '\nReason: '+str(e.reason))
             return
-        except urllib2.HTTPError, e:
+        except urllib.error.HTTPError as e:
             self.signals.errorOccurred.emit('Error occurred: '+str(e.code) + '\nReason: '+str(e.msg))
             return
 

@@ -8,9 +8,9 @@
 
 [general]
 name=OSMDownloader
-qgisMinimumVersion=2.0
+qgisMinimumVersion=3.0
 description=Plugin to download OSM data by area, using a selection by rectangle. The plugin can also automatically load the osm file into QGIS in a transparent way.
-version=0.5
+version=1.0
 author=Luiz Andrade
 email=lcoandrade@gmail.com
 

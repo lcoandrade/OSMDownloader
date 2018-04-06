@@ -20,18 +20,26 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from __future__ import absolute_import
+from builtins import object
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtGui import QIcon
 # Initialize Qt resources from file resources.py
-import resources_rc
+from . import resources_rc
 # Import the code for the dialog
-from osmDownloader_dialog import OSMDownloaderDialog
+from .osmDownloader_dialog import OSMDownloaderDialog
 import os.path
 
-from rectangleAreaTool import RectangleAreaTool
+from .rectangleAreaTool import RectangleAreaTool
 
+try:
+    import ptvsd
+    ptvsd.enable_attach(secret='my_secret', address = ('localhost', 5679))
+except:
+    pass
 
-class OSMDownloader:
+class OSMDownloader(object):
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
