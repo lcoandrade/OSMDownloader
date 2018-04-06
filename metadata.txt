@@ -1,10 +1,12 @@
-# This file contains metadata for your plugin. Since
-# version 2.0 of QGIS this is the proper way to supply
-# information about a plugin. The old method of
-# embedding metadata in __init__.py will
-# is no longer supported since version 2.0.
+# This file contains metadata for your plugin. Beginning
+# with version 1.8 this is the preferred way to supply information about a
+# plugin. The current method of embedding metadata in __init__.py will
+# be supported until version 2.0
 
-# This file should be included when you package your plugin.# Mandatory items:
+# This file should be included when you package your plugin.
+
+# Mandatory items:
+
 
 [general]
 name=OSMDownloader
@@ -13,19 +15,24 @@ description=Plugin to download OSM data by area, using a selection by rectangle.
 version=1.0
 author=Luiz Andrade
 email=lcoandrade@gmail.com
+about=
+	Plugin to download OSM data using threads with a simple area selection.
+    It can automatically load downloaded *.osm files as QGIS layers.
 
 # End of mandatory metadata
 
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-changelog=2015-04-10: Fixed bug to inform bad connections. Now it is possible to cancel the download by closing the progress bar. Minor fix to check if start point is equal to end point in the rectangle.2015-04-13: Fixed bug that occurred when canceling a started download.
+changelog=
+    2015-04-10: Fixed bug to inform bad connections. Now it is possible to cancel the download by closing the progress bar. Minor fix to check if start point is equal to end point in the rectangle.
+    2015-04-13: Fixed bug that occurred when canceling a started download.
 
 # Tags are comma separated with spaces allowed
 tags=OSM,downloader,rectangle,thread,area,OpenStreetMap,tool
 
-homepage=http://hub.qgis.org/projects/osmdownloader
-tracker=http://hub.qgis.org/projects/osmdownloader
+homepage=https://github.com/lcoandrade/OSMDownloader
+tracker=https://github.com/lcoandrade/OSMDownloader
 repository=https://github.com/lcoandrade/OSMDownloader
 category=Plugins
 icon=rectangle.png
