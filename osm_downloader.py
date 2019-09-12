@@ -66,7 +66,7 @@ class OSMRequest(QRunnable):
         self.stopped = True
 
     def getProxyConfiguration(self):
-        settings = QSettings('QGIS', 'QGIS2')
+        settings = QSettings()
         settings.beginGroup('proxy')
         enabled = str(settings.value('proxyEnable'))
         host = str(settings.value('proxyHost'))
