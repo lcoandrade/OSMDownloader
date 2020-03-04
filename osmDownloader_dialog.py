@@ -53,6 +53,8 @@ class OSMDownloaderDialog(QDialog, FORM_CLASS):
         self.threadpool = QThreadPool()
 
         self.size = 0
+        
+        self.plugin_dir = os.path.dirname(__file__)
 
     def setCoordinates(self, startX, startY, endX, endY):
         if startX < endX:
@@ -103,7 +105,10 @@ class OSMDownloaderDialog(QDialog, FORM_CLASS):
         osmRequest.signals.errorOccurred.connect(self.errorOccurred)
         osmRequest.signals.userCanceled.connect(self.userCanceled)
         # Setting the progress bar
-        self.progressMessageBar = self.iface.messageBar().createMessage('Downloading data...')
+        # << Updated by SIGMOÉ
+        self.msgBar = self.iface.messageBar()
+        self.progressMessageBar = self.msgBar.createMessage('Downloading data...')
+        # >>
         self.progressBar = QProgressBar()
         self.progressBar.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
         self.progressMessageBar.layout().addWidget(self.progressBar)
@@ -137,9 +142,25 @@ class OSMDownloaderDialog(QDialog, FORM_CLASS):
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
         self.progressMessageBar.setText('Downloaded '+"{0:.2f}".format(self.size)+' megabytes in total from OSM servers')
-        QMessageBox.warning(self, 'Info!', message)
 
         if self.checkBox.isChecked():
-            self.iface.addVectorLayer(self.filenameEdit.text(), 'osm_data', 'ogr')
-
+            # << Updated by SIGMOÉ
+            # Add each OSM layer with specific style
+            lyr_types = [
+                        ['multipolygons', 'polygon'],
+                        ['multilinestrings', 'line'], 
+                        ['lines', 'line'],
+                        ['points', 'point']
+                       ]
+            for lt in lyr_types:
+                lyr = self.iface.addVectorLayer(self.filenameEdit.text()+'|layername='+lt[0], 'osm', 'ogr')
+                style = "styles/osm_mapnik_" + lt[1] + ".qml"
+                qml_file = os.path.join(self.plugin_dir, style)
+                lyr.loadNamedStyle(qml_file)
+            # >>
+            
+        QMessageBox.warning(self, 'Info!', message)
+        # << Updated by SIGMOÉ
+        self.msgBar.clearWidgets()
+        # >>
         self.close()
