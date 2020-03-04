@@ -68,7 +68,9 @@ class OSMRequest(QRunnable):
     def getProxyConfiguration(self):
         settings = QSettings()
         settings.beginGroup('proxy')
-        enabled = str(settings.value('proxyEnable'))
+        # << Updated by SIGMOÉ
+        enabled = str(settings.value('proxyEnabled'))
+        # >>
         host = str(settings.value('proxyHost'))
         port = str(settings.value('proxyPort'))
         user = str(settings.value('proxyUser'))
