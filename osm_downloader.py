@@ -22,8 +22,6 @@
 """
 
 #Another way to do the Job with OVERPASS
-from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 import urllib.request, urllib.error, urllib.parse
 from qgis.PyQt.QtCore import QObject, pyqtSignal, QSettings, pyqtSlot, QThreadPool, QRunnable
