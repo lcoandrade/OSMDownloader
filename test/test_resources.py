@@ -8,9 +8,9 @@
 
 """
 
-__author__ = 'suporte.dsgtools@dsg.eb.mil.br'
+__author__ = 'lcoandrade@gmail.com'
 __date__ = '2015-04-07'
-__copyright__ = 'Copyright 2015, Brazilian Army - Geographic Service Bureau'
+__copyright__ = 'Copyright 2015, Luiz Andrade'
 
 import unittest
 

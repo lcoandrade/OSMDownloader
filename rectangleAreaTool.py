@@ -3,7 +3,7 @@
 /***************************************************************************
  DsgTools
                                  A QGIS plugin
- Brazilian Army Cartographic Production Tools
+ OSMDownloader
                               -------------------
         begin                : 2015-04-07
         git sha              : $Format:%H$

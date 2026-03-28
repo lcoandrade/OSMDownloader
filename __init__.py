@@ -6,8 +6,8 @@
  Plugin to download OSM data by area
                              -------------------
         begin                : 2015-04-07
-        copyright            : (C) 2015 by Brazilian Army - Geographic Service Bureau
-        email                : suporte.dsgtools@dsg.eb.mil.br
+        copyright            : (C) 2015 by Luiz Andrade
+        email                : lcoandrade@gmail.com
         git sha              : $Format:%H$
  ***************************************************************************/
 
