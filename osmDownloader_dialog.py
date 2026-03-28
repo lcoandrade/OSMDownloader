@@ -7,8 +7,8 @@
                              -------------------
         begin                : 2015-04-07
         git sha              : $Format:%H$
-        copyright            : (C) 2015 by Brazilian Army - Geographic Service Bureau
-        email                : suporte.dsgtools@dsg.eb.mil.br
+        copyright            : (C) 2015 by Luiz Andrade
+        email                : lcoandrade@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,9 +20,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-from __future__ import absolute_import
-
-from builtins import str
 import os
 
 from qgis.PyQt.QtWidgets import QDialog, QFileDialog, QMessageBox, QProgressBar
@@ -110,9 +107,9 @@ class OSMDownloaderDialog(QDialog, FORM_CLASS):
         self.progressMessageBar = self.msgBar.createMessage('Downloading data...')
         # >>
         self.progressBar = QProgressBar()
-        self.progressBar.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+        self.progressBar.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.progressMessageBar.layout().addWidget(self.progressBar)
-        self.iface.messageBar().pushWidget(self.progressMessageBar, Qgis.Info)
+        self.iface.messageBar().pushWidget(self.progressMessageBar, Qgis.MessageLevel.Info)
         self.progressBar.setRange(0, 0)
         self.progressMessageBar.destroyed.connect(osmRequest.signals.cancel)
         # Starting process

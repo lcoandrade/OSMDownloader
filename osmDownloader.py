@@ -7,8 +7,8 @@
                               -------------------
         begin                : 2015-04-07
         git sha              : $Format:%H$
-        copyright            : (C) 2015 by Brazilian Army - Geographic Service Bureau
-        email                : suporte.dsgtools@dsg.eb.mil.br
+        copyright            : (C) 2015 by Luiz Andrade
+        email                : lcoandrade@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,9 +20,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from __future__ import absolute_import
-from builtins import object
-from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 # Initialize Qt resources from file resources.py
@@ -33,13 +31,8 @@ import os.path
 
 from .rectangleAreaTool import RectangleAreaTool
 
-try:
-    import ptvsd
-    ptvsd.enable_attach(secret='my_secret', address = ('localhost', 5679))
-except:
-    pass
 
-class OSMDownloader(object):
+class OSMDownloader:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -64,9 +57,7 @@ class OSMDownloader(object):
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
-
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
+            QCoreApplication.installTranslator(self.translator)
 
         # Declare instance attributes
         self.actions = []
@@ -202,7 +193,7 @@ class OSMDownloader(object):
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        result = self.dlg.exec()
         # See if OK was pressed
         if result:
             # Do something useful here - delete the line containing pass and

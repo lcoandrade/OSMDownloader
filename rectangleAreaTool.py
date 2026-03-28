@@ -7,8 +7,8 @@
                               -------------------
         begin                : 2015-04-07
         git sha              : $Format:%H$
-        copyright            : (C) 2014 by Luiz Andrade - Cartographic Engineer @ Brazilian Army
-        email                : luiz.claudio@dsg.eb.mil.br
+        copyright            : (C) 2015 by Luiz Andrade
+        email                : lcoandrade@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -21,7 +21,7 @@
  ***************************************************************************/
 """
 from qgis.gui import QgsMapTool, QgsRubberBand
-from qgis.core import QgsWkbTypes, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
+from qgis.core import Qgis, QgsWkbTypes, QgsPointXY, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -35,7 +35,7 @@ class RectangleAreaTool(QgsMapTool):
         self.canvas = canvas
         self.active = False
         self.setAction(action)
-        self.rubberBand = QgsRubberBand(self.canvas, QgsWkbTypes.PolygonGeometry)
+        self.rubberBand = QgsRubberBand(self.canvas, Qgis.GeometryType.Polygon)
         mFillColor = QColor(254, 178, 76, 63)
         self.rubberBand.setColor(mFillColor)
         self.rubberBand.setWidth(1)
@@ -44,7 +44,7 @@ class RectangleAreaTool(QgsMapTool):
     def reset(self):
         self.startPoint = self.endPoint = None
         self.isEmittingPoint = False
-        self.rubberBand.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubberBand.reset(Qgis.GeometryType.Polygon)
 
     def canvasPressEvent(self, e):
         self.startPoint = self.toMapCoordinates(e.pos())
@@ -65,7 +65,7 @@ class RectangleAreaTool(QgsMapTool):
         self.showRect(self.startPoint, self.endPoint)
 
     def showRect(self, startPoint, endPoint):
-        self.rubberBand.reset(QgsWkbTypes.PolygonGeometry)
+        self.rubberBand.reset(Qgis.GeometryType.Polygon)
         if startPoint.x() == endPoint.x() or startPoint.y() == endPoint.y():
             return
         point1 = QgsPointXY(startPoint.x(), startPoint.y())

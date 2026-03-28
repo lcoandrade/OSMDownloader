@@ -7,8 +7,8 @@
                              -------------------
         begin                : 2015-04-07
         git sha              : $Format:%H$
-        copyright            : (C) 2015 by Brazilian Army - Geographic Service Bureau
-        email                : suporte.dsgtools@dsg.eb.mil.br
+        copyright            : (C) 2015 by Luiz Andrade
+        email                : lcoandrade@gmail.com
  ***************************************************************************/
 
 /***************************************************************************
@@ -22,7 +22,6 @@
 """
 
 #Another way to do the Job with OVERPASS
-from builtins import str
 import urllib.request, urllib.error, urllib.parse
 from qgis.PyQt.QtCore import QObject, pyqtSignal, QSettings, pyqtSlot, QThreadPool, QRunnable
 import time

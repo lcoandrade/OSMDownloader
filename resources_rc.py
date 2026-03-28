@@ -6,7 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore
+from qgis.PyQt import QtCore
 
 qt_resource_data = b"\
 \x00\x00\x13\x31\
@@ -354,13 +354,8 @@ qt_resource_struct_v2 = b"\
 \x00\x00\x01\x62\x97\x8d\xa3\xc2\
 "
 
-qt_version = QtCore.qVersion().split('.')
-if qt_version < ['5', '8', '0']:
-    rcc_version = 1
-    qt_resource_struct = qt_resource_struct_v1
-else:
-    rcc_version = 2
-    qt_resource_struct = qt_resource_struct_v2
+rcc_version = 2
+qt_resource_struct = qt_resource_struct_v2
 
 def qInitResources():
     QtCore.qRegisterResourceData(rcc_version, qt_resource_struct, qt_resource_name, qt_resource_data)
