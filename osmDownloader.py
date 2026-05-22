@@ -27,9 +27,24 @@ from qgis.PyQt.QtGui import QIcon
 from . import resources_rc
 # Import the code for the dialog
 from .osmDownloader_dialog import OSMDownloaderDialog
+import os
 import os.path
 
 from .rectangleAreaTool import RectangleAreaTool
+
+
+def _start_debugpy():
+    if not os.environ.get("QGIS_DEBUGPY"):
+        return
+    try:
+        import debugpy
+        debugpy.configure(
+            python="/Applications/QGIS-final-4_0_2.app/Contents/MacOS/python"
+        )
+        if not debugpy.is_client_connected():
+            debugpy.listen(5678)
+    except Exception:
+        pass
 
 
 class OSMDownloader:
@@ -43,6 +58,7 @@ class OSMDownloader:
             application at run time.
         :type iface: QgsInterface
         """
+        _start_debugpy()
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory

@@ -24,6 +24,7 @@
 #Another way to do the Job with OVERPASS
 import urllib.request, urllib.error, urllib.parse
 from qgis.PyQt.QtCore import QObject, pyqtSignal, QSettings, pyqtSlot, QThreadPool, QRunnable
+from qgis.core import QgsMessageLog, Qgis
 import time
 import sys
 
@@ -105,9 +106,12 @@ class OSMRequest(QRunnable):
         return xmlData
 
     def makeRequest(self):
-        osmUrl = 'http://overpass-api.de/api/interpreter'
+        osmUrl = 'https://overpass-api.de/api/interpreter'
         postFile = self.makePostFile()
-        req = urllib.request.Request(url=osmUrl, data=postFile, headers={'Content-Type': 'application/xml'})
+        req = urllib.request.Request(url=osmUrl, data=postFile, headers={
+            'Content-Type': 'application/xml',
+            'User-Agent': 'OSMDownloader/1.1.1 QGIS-Plugin (+https://github.com/luiz-coelho/OSMDownloader)',
+        })
         return req
 
     def run(self):
@@ -117,11 +121,20 @@ class OSMRequest(QRunnable):
 
         try:
             response = urllib.request.urlopen(req)
-        except urllib.error.URLError as e:
-            self.signals.errorOccurred.emit('Error occurred: '+str(e.args) + '\nReason: '+str(e.reason))
-            return
         except urllib.error.HTTPError as e:
-            self.signals.errorOccurred.emit('Error occurred: '+str(e.code) + '\nReason: '+str(e.msg))
+            body = e.read().decode('utf-8', errors='replace').strip()
+            msg = (
+                f'HTTP {e.code} {e.msg}\n'
+                f'URL: {e.url}\n'
+                + (f'Details: {body}' if body else '')
+            )
+            QgsMessageLog.logMessage(msg, 'OSMDownloader', Qgis.MessageLevel.Critical)
+            self.signals.errorOccurred.emit(f'HTTP {e.code} {e.msg}')
+            return
+        except urllib.error.URLError as e:
+            msg = f'Connection error\nReason: {e.reason}'
+            QgsMessageLog.logMessage(msg, 'OSMDownloader', Qgis.MessageLevel.Critical)
+            self.signals.errorOccurred.emit(msg)
             return
 
         local_file = open(self.filename, 'wb')
@@ -140,7 +153,9 @@ class OSMRequest(QRunnable):
                 total_size += size
             except:
                 local_file.close()
-                self.signals.errorOccurred.emit('An error occurred writing the osm file.')
+                msg = 'An error occurred writing the osm file.'
+                QgsMessageLog.logMessage(msg, 'OSMDownloader', Qgis.MessageLevel.Critical)
+                self.signals.errorOccurred.emit(msg)
                 return
 
         local_file.close()
