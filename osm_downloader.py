@@ -120,7 +120,7 @@ class OSMRequest(QRunnable):
         req = self.makeRequest()
 
         try:
-            response = urllib.request.urlopen(req)
+            response = urllib.request.urlopen(req)  # nosec B310 - URL is hardcoded to https://overpass-api.de
         except urllib.error.HTTPError as e:
             body = e.read().decode('utf-8', errors='replace').strip()
             msg = (

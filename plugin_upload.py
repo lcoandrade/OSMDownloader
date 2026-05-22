@@ -12,6 +12,12 @@ import getpass
 import xmlrpc.client
 from optparse import OptionParser
 
+try:
+    import defusedxml.xmlrpc
+    defusedxml.xmlrpc.monkey_patch()
+except ImportError:
+    pass
+
 # Configuration
 PROTOCOL = 'http'
 SERVER = 'plugins.qgis.org'
@@ -26,7 +32,7 @@ def main(parameters, arguments):
     :param parameters: Command line parameters.
     :param arguments: Command line arguments.
     """
-    address = "%s://%s:%s@%s:%s%s" % (
+    address = "%s://%s:%s@%s:%s%s" % (  # pragma: allowlist secret
         PROTOCOL,
         parameters.username,
         parameters.password,
