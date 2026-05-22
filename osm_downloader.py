@@ -21,8 +21,9 @@
  ***************************************************************************/
 """
 
-#Another way to do the Job with OVERPASS
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
+import urllib.error
+import urllib.parse
 from qgis.PyQt.QtCore import QObject, pyqtSignal, QSettings, pyqtSlot, QThreadPool, QRunnable
 from qgis.core import QgsMessageLog, Qgis
 import time
