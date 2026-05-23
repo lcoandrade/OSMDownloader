@@ -104,24 +104,41 @@ class OSMRequest(QRunnable):
         xmlData = xmlData.encode('utf-8')
         return xmlData
 
-    def makeRequest(self):
-        osmUrl = 'http://overpass-api.de/api/interpreter'
-        postFile = self.makePostFile()
-        req = urllib.request.Request(url=osmUrl, data=postFile, headers={'Content-Type': 'application/xml'})
-        return req
+   OVERPASS_MIRRORS = [
+       'https://overpass-api.de/api/interpreter',
+       'https://overpass.kumi.systems/api/interpreter',
+       'https://overpass.openstreetmap.ru/api/interpreter',
+   ]
+
+   def makeRequest(self, mirror_url=None):
+       osmUrl = mirror_url or self.OVERPASS_MIRRORS[0]
+       postFile = self.makePostFile()
+       req = urllib.request.Request(url=osmUrl, data=postFile, headers={
+           'Content-Type': 'application/xml',
+           'User-Agent': 'OSMDownloader/1.0.4 QGIS-Plugin (+https://github.com/lcoandrade/OSMDownloader)',
+       })
+       return req
 
     def run(self):
         self.setUrllibProxy()
 
-        req = self.makeRequest()
+        response = None
+        last_error = None
 
-        try:
-            response = urllib.request.urlopen(req)
-        except urllib.error.URLError as e:
-            self.signals.errorOccurred.emit('Error occurred: '+str(e.args) + '\nReason: '+str(e.reason))
-            return
-        except urllib.error.HTTPError as e:
-            self.signals.errorOccurred.emit('Error occurred: '+str(e.code) + '\nReason: '+str(e.msg))
+        for mirror in self.OVERPASS_MIRRORS:
+            req = self.makeRequest(mirror_url=mirror)
+            try:
+                response = urllib.request.urlopen(req, timeout=200)
+                break
+            except urllib.error.HTTPError as e:
+                last_error = f'HTTP {e.code} {e.msg} [{mirror}]'
+                continue
+            except urllib.error.URLError as e:
+                last_error = f'Connection error [{mirror}]: {e.reason}'
+                continue
+
+        if response is None:
+            self.signals.errorOccurred.emit(f'All mirrors failed. Last error: {last_error}')
             return
 
         local_file = open(self.filename, 'wb')
