@@ -27,10 +27,11 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import pyqtSlot, QThreadPool, Qt
 from qgis.core import Qgis
 
+from .osm_downloader import OSMRequest
+
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'osmDownloader_dialog_base.ui'))
 
-from .osm_downloader import OSMRequest
 
 class OSMDownloaderDialog(QDialog, FORM_CLASS):
     def __init__(self, iface, startX, startY, endX, endY, parent=None):
@@ -50,7 +51,7 @@ class OSMDownloaderDialog(QDialog, FORM_CLASS):
         self.threadpool = QThreadPool()
 
         self.size = 0
-        
+
         self.plugin_dir = os.path.dirname(__file__)
 
     def setCoordinates(self, startX, startY, endX, endY):
@@ -79,7 +80,7 @@ class OSMDownloaderDialog(QDialog, FORM_CLASS):
         fileName = ret[0]
 
         split = fileName.split('.')
-        if len(split)>0 and split[-1] == 'osm':
+        if len(split) > 0 and split[-1] == 'osm':
             pass
         else:
             fileName += '.osm'
@@ -117,7 +118,7 @@ class OSMDownloaderDialog(QDialog, FORM_CLASS):
 
     @pyqtSlot(str)
     def proxy(self, proxy):
-        self.progressMessageBar.setText('Proxy set to: '+proxy)
+        self.progressMessageBar.setText('Proxy set to: ' + proxy)
 
     @pyqtSlot(str)
     def errorOccurred(self, message):
@@ -132,30 +133,30 @@ class OSMDownloaderDialog(QDialog, FORM_CLASS):
     @pyqtSlot(float)
     def reportSize(self, size):
         self.size = size
-        self.progressMessageBar.setText('Downloading: '+"{0:.2f}".format(size)+' megabytes from OSM servers...')
+        self.progressMessageBar.setText('Downloading: ' + "{0:.2f}".format(size) + ' megabytes from OSM servers...')
 
     @pyqtSlot(str)
     def processFinished(self, message):
         self.progressBar.setRange(0, 100)
         self.progressBar.setValue(100)
-        self.progressMessageBar.setText('Downloaded '+"{0:.2f}".format(self.size)+' megabytes in total from OSM servers')
+        self.progressMessageBar.setText('Downloaded ' + "{0:.2f}".format(self.size) + ' megabytes in total from OSM servers')
 
         if self.checkBox.isChecked():
             # << Updated by SIGMOÉ
             # Add each OSM layer with specific style
             lyr_types = [
-                        ['multipolygons', 'polygon'],
-                        ['multilinestrings', 'line'], 
-                        ['lines', 'line'],
-                        ['points', 'point']
-                       ]
+                ['multipolygons', 'polygon'],
+                ['multilinestrings', 'line'],
+                ['lines', 'line'],
+                ['points', 'point']
+            ]
             for lt in lyr_types:
-                lyr = self.iface.addVectorLayer(self.filenameEdit.text()+'|layername='+lt[0], 'osm', 'ogr')
+                lyr = self.iface.addVectorLayer(self.filenameEdit.text() + '|layername=' + lt[0], 'osm', 'ogr')
                 style = "styles/osm_mapnik_" + lt[1] + ".qml"
                 qml_file = os.path.join(self.plugin_dir, style)
                 lyr.loadNamedStyle(qml_file)
             # >>
-            
+
         QMessageBox.warning(self, 'Info!', message)
         # << Updated by SIGMOÉ
         self.msgBar.clearWidgets()

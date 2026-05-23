@@ -21,9 +21,11 @@
  ***************************************************************************/
 """
 
-#Another way to do the Job with OVERPASS
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
+import urllib.error
+import urllib.parse
 from qgis.PyQt.QtCore import QObject, pyqtSignal, QSettings, pyqtSlot, QThreadPool, QRunnable
+from qgis.core import QgsMessageLog, Qgis
 import time
 import sys
 
@@ -157,7 +159,9 @@ class OSMRequest(QRunnable):
                 total_size += size
             except:
                 local_file.close()
-                self.signals.errorOccurred.emit('An error occurred writing the osm file.')
+                msg = 'An error occurred writing the osm file.'
+                QgsMessageLog.logMessage(msg, 'OSMDownloader', Qgis.MessageLevel.Critical)
+                self.signals.errorOccurred.emit(msg)
                 return
 
         local_file.close()

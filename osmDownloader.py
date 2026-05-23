@@ -20,15 +20,13 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os.path
+
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
-# Initialize Qt resources from file resources.py
-from . import resources_rc
-# Import the code for the dialog
-from .osmDownloader_dialog import OSMDownloaderDialog
-import os.path
 
+from .osmDownloader_dialog import OSMDownloaderDialog
 from .rectangleAreaTool import RectangleAreaTool
 
 
@@ -92,7 +90,8 @@ class OSMDownloader:
         status_tip=None,
         whats_this=None,
         parent=None,
-        checkable=True):
+        checkable=True,
+    ):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -162,12 +161,12 @@ class OSMDownloader:
 
         icon_path = ':/plugins/OSMDownloader/rectangle.png'
         self.rectangleAction = self.add_action(
-                                        icon_path,
-                                        text=self.tr(u'Download OSM data by rectangle selection'),
-                                        callback=self.runRectangle,
-                                        parent=self.iface.mainWindow(),
-                                        add_to_menu=False,
-                                        checkable=True)
+            icon_path,
+            text=self.tr(u'Download OSM data by rectangle selection'),
+            callback=self.runRectangle,
+            parent=self.iface.mainWindow(),
+            add_to_menu=False,
+            checkable=True)
 
         self.rectangleAreaTool = RectangleAreaTool(self.iface.mapCanvas(), self.rectangleAction)
 
@@ -196,8 +195,6 @@ class OSMDownloader:
         result = self.dlg.exec()
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
             pass
 
     def runRectangle(self, b):
@@ -205,4 +202,3 @@ class OSMDownloader:
             self.iface.mapCanvas().setMapTool(self.rectangleAreaTool)
         else:
             self.iface.mapCanvas().unsetMapTool(self.rectangleAreaTool)
-
